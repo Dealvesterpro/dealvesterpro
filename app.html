@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DealVester Analyzer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 20px;
+      background: #f9fafb;
+      color: #111827;
+    }
+    h1 {
+      text-align: center;
+      color: #2563eb;
+    }
+    .form-group {
+      margin: 15px 0;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .results {
+      margin-top: 30px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .results h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>DealVester Analyzer</h1>
+  <p style="text-align:center;">Enter your deal details below:</p>
+
+  <div>
+    <div class="form-group">
+      <label for="price">Purchase Price ($):</label>
+      <input type="number" id="price" placeholder="200000">
+    </div>
+    <div class="form-group">
+      <label for="rent">Monthly Rent ($):</label>
+      <input type="number" id="rent" placeholder="1800">
+    </div>
+    <div class="form-group">
+      <label for="expenses">Monthly Expenses ($):</label>
+      <input type="number" id="expenses" placeholder="600">
+    </div>
+    <div class="form-group">
+      <label for="down">Down Payment %:</label>
+      <input type="number" id="down" placeholder="20">
+    </div>
+    <div class="form-group">
+      <label for="rate">Interest Rate %:</label>
+      <input type="number" id="rate" placeholder="6.5">
+    </div>
+    <div class="form-group">
+      <label for="years">Loan Term (years):</label>
+      <input type="number" id="years" placeholder="30">
+    </div>
+    <button onclick="calculateDeal()">Compute Deal</button>
+  </div>
+
+  <div class="results" id="results" style="display:none;">
+    <h2>Results</h2>
+    <p><strong>Loan Amount:</strong> $<span id="loan"></span></p>
+    <p><strong>Monthly Mortgage:</strong> $<span id="mortgage"></span></p>
+    <p><strong>Monthly Cash Flow:</strong> $<span id="cashflow"></span></p>
+    <p><strong>Cash-on-Cash ROI:</strong> <span id="coc"></span>%</p>
+    <p><strong>1% Rule:</strong> <span id="rule"></span></p>
+  </div>
+
+  <script>
+    function calculateDeal() {
+      const price = parseFloat(document.getElementById("price").value);
+      const rent = parseFloat(document.getElementById("rent").value);
+      const expenses = parseFloat(document.getElementById("expenses").value);
+      const downPct = parseFloat(document.getElementById("down").value) / 100;
+      const rate = parseFloat(document.getElementById("rate").value) / 100 / 12;
+      const years = parseFloat(document.getElementById("years").value);
+
+      if (!price || !rent || !expenses || !downPct || !rate || !years) {
+        alert("Please fill in all fields");
+        return;
+      }
+
+      const downPayment = price * downPct;
+      const loanAmount = price - downPayment;
+      const n = years * 12;
+      const monthlyMortgage = (loanAmount * rate) / (1 - Math.pow(1 + rate, -n));
+
+      const cashFlow = rent - expenses - monthlyMortgage;
+      const annualCashFlow = cashFlow * 12;
+      const cocROI = ((annualCashFlow) / downPayment * 100).toFixed(2);
+      const onePercentRule = (rent >= price * 0.01) ? "✅ Meets 1% Rule" : "❌ Does Not Meet 1% Rule";
+
+      document.getElementById("loan").innerText = loanAmount.toFixed(0);
+      document.getElementById("mortgage").innerText = monthlyMortgage.toFixed(0);
+      document.getElementById("cashflow").innerText = cashFlow.toFixed(0);
+      document.getElementById("coc").innerText = cocROI;
+      document.getElementById("rule").innerText = onePercentRule;
+
+      document.getElementById("results").style.display = "block";
+    }
+  </script>
+</body>
+</html>
